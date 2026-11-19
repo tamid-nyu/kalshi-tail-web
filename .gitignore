@@ -1,0 +1,8 @@
+.codex-run.log
+.env*
+.vercel
+node_modules
+
+.next/
+.remember/
+*.tsbuildinfo
