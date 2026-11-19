@@ -1,5 +1,116 @@
-'use client';
-import {useEffect,useState} from 'react';
-import {Shell,Table,API} from '../../components/Lab';
-import {response} from '../../components/client';
-export default function Ingest(){const[logs,setLogs]=useState<any[]>([]);const[day,setDay]=useState('');const[busy,setBusy]=useState(false);const[message,setMessage]=useState('');const[markets,setMarkets]=useState('BTC,SPX,GOLD,WTI,NATGAS');async function refresh(){try{setLogs(await fetch(API+'/ingest/logs').then(response))}catch(e){setMessage(String(e))}}useEffect(()=>{refresh()},[]);async function run(){setBusy(true);setMessage('Pulling settled ladders and hourly decision/fill quotes. This can take a few minutes.');try{const r=await fetch('/api/lab/ingest/trigger',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...(day?{day}:{}),markets:markets.split(',').map(x=>x.trim())})}).then(response);setMessage(`Ingest ${r.status}: ${r.rows} observations stored.`);await refresh()}catch(e){setMessage(String(e));await refresh()}finally{setBusy(false)}}return <Shell active="Ingest log"><section className="page-heading"><div><p className="breadcrumb">Data / Ingestion</p><h1>Keep the forward test current</h1><p className="intro">Settled observations from Kalshi, with every attempt recorded.</p></div></section><section className="panel"><h2>Pull a completed expiry day</h2><p>The daily job runs at 23:00 UTC, after 5pm New York time year-round, and pulls the previous day. Re-running a day replaces its observation partition without duplicating rows.</p><div className="form-grid"><label>Expiry day<input type="date" value={day} onChange={e=>setDay(e.target.value)}/><small>Leave blank for yesterday in New York.</small></label><label>Markets<input value={markets} onChange={e=>setMarkets(e.target.value)}/></label></div><div className="actions"><button className="primary" disabled={busy} onClick={run}>{busy?'Ingesting…':'Run ingestion'}</button><button onClick={refresh}>Refresh log</button></div><p role="status">{message}</p></section>{logs.length?logs.map(log=><section className="panel" key={log.id}><div className="section-title"><h2>{log.day} · {log.status}</h2><span className="badge">{log.rows} observations</span></div><p className="muted">Started {log.started} · {log.id}</p><Table rows={log.markets} columns={['market','status','rows','contracts','error']}/>{log.forward_error&&<p className="error">Forward update: {log.forward_error}</p>}</section>):<section className="panel"><p>No ingestion attempts yet. Run a completed expiry day above.</p></section>}</Shell>}
+"use client";
+import { useEffect, useState } from "react";
+import { Shell, Table, API } from "../../components/Lab";
+import { response } from "../../components/client";
+export default function Ingest() {
+  const [logs, setLogs] = useState<any[]>([]);
+  const [day, setDay] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+  const [markets, setMarkets] = useState("BTC,SPX,GOLD,WTI,NATGAS");
+  async function refresh() {
+    try {
+      setLogs(await fetch(API + "/ingest/logs").then(response));
+    } catch (e) {
+      setMessage(String(e));
+    }
+  }
+  useEffect(() => {
+    refresh();
+  }, []);
+  async function run() {
+    setBusy(true);
+    setMessage(
+      "Pulling settled ladders and hourly decision/fill quotes. This can take a few minutes.",
+    );
+    try {
+      const r = await fetch("/api/lab/ingest/trigger", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...(day ? { day } : {}),
+          markets: markets.split(",").map((x) => x.trim()),
+        }),
+      }).then(response);
+      setMessage(`Ingest ${r.status}: ${r.rows} observations stored.`);
+      await refresh();
+    } catch (e) {
+      setMessage(String(e));
+      await refresh();
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <Shell active="Ingest log">
+      <section className="page-heading">
+        <div>
+          <p className="breadcrumb">Data / Ingestion</p>
+          <h1>Keep the forward test current</h1>
+          <p className="intro">
+            Settled observations from Kalshi, with every attempt recorded.
+          </p>
+        </div>
+      </section>
+      <section className="panel">
+        <h2>Pull a completed expiry day</h2>
+        <p>
+          The daily job runs at 23:00 UTC, after 5pm New York time year-round,
+          and pulls the previous day. Re-running a day replaces its observation
+          partition without duplicating rows.
+        </p>
+        <div className="form-grid">
+          <label>
+            Expiry day
+            <input
+              type="date"
+              value={day}
+              onChange={(e) => setDay(e.target.value)}
+            />
+            <small>Leave blank for yesterday in New York.</small>
+          </label>
+          <label>
+            Markets
+            <input
+              value={markets}
+              onChange={(e) => setMarkets(e.target.value)}
+            />
+          </label>
+        </div>
+        <div className="actions">
+          <button className="primary" disabled={busy} onClick={run}>
+            {busy ? "Ingesting…" : "Run ingestion"}
+          </button>
+          <button onClick={refresh}>Refresh log</button>
+        </div>
+        <p role="status">{message}</p>
+      </section>
+      {logs.length ? (
+        logs.map((log) => (
+          <section className="panel" key={log.id}>
+            <div className="section-title">
+              <h2>
+                {log.day} · {log.status}
+              </h2>
+              <span className="badge">{log.rows} observations</span>
+            </div>
+            <p className="muted">
+              Started {log.started} · {log.id}
+            </p>
+            <Table
+              rows={log.markets}
+              columns={["market", "status", "rows", "contracts", "error"]}
+            />
+            {log.forward_error && (
+              <p className="error">Forward update: {log.forward_error}</p>
+            )}
+          </section>
+        ))
+      ) : (
+        <section className="panel">
+          <p>No ingestion attempts yet. Run a completed expiry day above.</p>
+        </section>
+      )}
+    </Shell>
+  );
+}
