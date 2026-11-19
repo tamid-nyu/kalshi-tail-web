@@ -559,3 +559,8 @@ summary {
 .recharts-cartesian-axis-tick text {
   fill: var(--muted);
 }
+input[type="file"] {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
