@@ -548,3 +548,14 @@ summary {
   font-size: 12px;
   line-height: 1.7;
 }
+.recharts-default-tooltip {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+  color: var(--ink) !important;
+}
+.recharts-tooltip-label {
+  color: var(--ink) !important;
+}
+.recharts-cartesian-axis-tick text {
+  fill: var(--muted);
+}

@@ -262,8 +262,9 @@ export default function Runs() {
         </div>
         <p className="muted">
           A history threshold below 150 days is exploratory. #5 and #7 require
-          BTC alone, estimator S, and complete model probabilities. Markets with
-          missing history produce a validation error.
+          BTC alone, estimator S, k = 1, C = c, and complete model
+          probabilities. Markets with missing history produce a validation
+          error.
         </p>
         <button
           className="primary"

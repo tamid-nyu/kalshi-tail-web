@@ -8,6 +8,7 @@ export default function Uploads() {
   const [name, setName] = useState("");
   const [mapping, setMapping] = useState<Record<string, string>>({});
   const [preview, setPreview] = useState<any>();
+  const [sourceColumns, setSourceColumns] = useState<any[]>([]);
   const [items, setItems] = useState<any[]>([]);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
@@ -24,6 +25,7 @@ export default function Uploads() {
   function pick(f?: File) {
     setFile(f);
     setPreview(null);
+    setSourceColumns([]);
     setMapping({});
     setMessage("");
   }
@@ -49,6 +51,7 @@ export default function Uploads() {
         body: form,
       }).then(response);
       setPreview(r);
+      if (!sourceColumns.length) setSourceColumns(r.columns);
       setMessage(
         save
           ? `Saved version ${r.id}. Available as a backtest input when its type is observations.`
@@ -155,13 +158,14 @@ export default function Uploads() {
           names below, then select the observation type and validate again.
           Required observation fields: ticker, expiry, day, H, y, bid, ask,
           bid_f, ask_f, floor, strike_type. Prices are probabilities from 0 to
-          1; H is 6 or 3; y is the settled 0/1 outcome.
+          1; H is 6 or 3 for trading (source 12h rows are accepted and ignored);
+          y is the settled 0/1 outcome.
         </p>
         {preview && (
           <>
             <h3>Column mapping</h3>
             <div className="form-grid">
-              {preview.columns.map((c: any) => (
+              {sourceColumns.map((c: any) => (
                 <label key={c.name}>
                   {c.name} ({c.dtype})
                   <input
