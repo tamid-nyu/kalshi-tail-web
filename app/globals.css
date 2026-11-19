@@ -564,3 +564,6 @@ input[type="file"] {
   max-width: 100%;
   min-width: 0;
 }
+.two-col > * {
+  min-width: 0;
+}
