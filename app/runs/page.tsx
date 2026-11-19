@@ -99,8 +99,12 @@ export default function Runs() {
       }).then(response);
       setRun(r);
       setSelected(r.id);
+      const held = r.result?.forward_rows_held_back ?? 0;
       setMessage(
-        `Completed: ${r.summary.trades} trades, ${money(r.summary.pnl)} P&L.`,
+        `Completed: ${r.summary.trades} trades, ${money(r.summary.pnl)} P&L.` +
+          (held
+            ? ` ${held} forward observations were held back (V2/V3 forward results open May 12, 2027).`
+            : ""),
       );
       await refresh();
     } catch (e) {
@@ -216,6 +220,8 @@ export default function Runs() {
             >
               <option value="S">S · separate learning</option>
               <option value="P">P · partial pooling</option>
+              <option value="V2">V2 · predictor v2 (pooled logistic, F1)</option>
+              <option value="V3">V3 · predictor v3 (v2 + P blend)</option>
             </select>
           </label>
           <label>
@@ -264,7 +270,8 @@ export default function Runs() {
           A history threshold below 150 days is exploratory. #5 and #7 require
           BTC alone, estimator S, k = 1, C = c, and complete model
           probabilities. Markets with missing history produce a validation
-          error.
+          error. V2 and V3 are frozen for a forward verdict read on or after
+          May 12, 2027; until then their runs stop at November 11, 2026.
         </p>
         <button
           className="primary"

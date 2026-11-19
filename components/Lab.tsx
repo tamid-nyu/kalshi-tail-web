@@ -327,6 +327,14 @@ export default function Lab() {
                       {data.forward.summary.days} observed expiry days.
                     </p>
                   )}
+                  {data.forward.blinded_estimators?.length > 0 && (
+                    <p className="muted">
+                      Shown for v1 estimators S and P.{" "}
+                      {data.forward.blinded_estimators.join(" and ")} are scored
+                      once on or after {data.forward.forward_open}, as
+                      pre-registered.
+                    </p>
+                  )}
                   <p className="muted">{data.forward.note}</p>
                 </>
               )}
